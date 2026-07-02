@@ -9,16 +9,18 @@ request = {
         "u_component_of_wind",
         "v_component_of_wind"
     ],
-    "pressure_level": ["500", "850"],
     "year": ["2020"],
     "month": ["01"],
     "day": ["01", "02", "03"],
-    "time": ["00:00", "06:00", "12:00", "18:00"],
+    "time": [
+        "00:00", "06:00", "12:00",
+        "18:00"
+    ],
+    "pressure_level": ["500", "850"],
     "data_format": "netcdf",
-    "download_format": "unarchived",
-    "area": [60, -10, 48, 2]
+    "download_format": "unarchived"
 }
 
-target = "data/raw/era5_pressure_sample.nc"
-result = client.retrieve(dataset, request)
-result.download(target)
+
+target = "data/raw/era5_sample.nc"
+client.retrieve(dataset, request).download()
