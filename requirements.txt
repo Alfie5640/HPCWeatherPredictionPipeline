@@ -1,0 +1,10 @@
+xarray
+netCDF4
+dask[complete]
+numpy
+pandas
+scikit-learn
+xgboost
+fastapi
+uvicorn
+matplotlib
