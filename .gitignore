@@ -220,3 +220,7 @@ __marimo__/
 # Data files (too large for git)
 data/raw/*
 !data/raw/.gitkeep
+
+# Processed data files (derived, can be regenerated)
+data/processed/*
+!data/processed/.gitkeep
