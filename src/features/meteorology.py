@@ -61,11 +61,11 @@ def compute_cape_for_timestep(ds: xr.Dataset, time: int) -> np.ndarray:
 
 
 def compute_cape_dask_batched(ds: xr.Dataset) -> xr.DataArray:
-    """Dask parallelized CAPE computation, batched by timestep"""
+    """Dask parallelized CAPE computation, batched by timestep, using process-based scheduler"""
     n_time = len(ds['valid_time'])
 
     promises = [delayed(compute_cape_for_timestep)(ds, t) for t in range(n_time)]
-    results = dask.compute(*promises)
+    results = dask.compute(*promises, scheduler='processes')
     capeArr = np.stack(results, axis=-1)
 
     return xr.DataArray(
@@ -79,22 +79,43 @@ def compute_cape_dask_batched(ds: xr.Dataset) -> xr.DataArray:
         name="cape"
     )
 
+def compute_brn(cape: xr.DataArray, shear: xr.DataArray) -> xr.DataArray:
+    """
+    Bulk Richardson Number (ratio of CAPE to shear squared)
+    """
+    # guard against zero shear
+    safe_shear = shear.where(shear != 0, 1)
+    return cape / (0.5 * safe_shear**2)
+
+def label_from_thresholds(cape: xr.DataArray, shear: xr.DataArray, cape_thresh: float = 500, shear_thresh: float = 15) -> xr.DataArray:
+    """
+    Label as severe favorable if CAPE and shear exceed given thresholds
+    """
+    return (cape >= cape_thresh) & (shear >= shear_thresh)
+
+def label_from_brn(brn: xr.DataArray, low: float = 10, high: float = 45) -> xr.DataArray:
+    """
+    Label as severe favorable if BRN is in the classic range
+    Known limitation: BRN is a ratio (CAPE / shear^2), so in near-zero instability
+    environments, very small CAPE and correspondingly small shear can still
+    produce a BRN value inside the accepted range, giving false positives.
+    """
+    return (brn >= low) & (brn <= high)
 
 
 def compute_shear_features(ds: xr.Dataset) -> xr.Dataset:
-    """
-    Compute bulk and directional shear for 10m->850hPa and 850hPa->500hPa layers.
-    Expects ds to have u10, v10, u, v (with pressure_level dim including 850 and 500).
-    Returns a new Dataset containing the shear variables
-    """
-    u850, v850 = ds['u'].sel(pressure_level=850), ds['v'].sel(pressure_level=850)
-    u500, v500 = ds['u'].sel(pressure_level=500), ds['v'].sel(pressure_level=500)
+    u850 = ds['u'].sel(pressure_level=850).drop_vars('pressure_level')
+    v850 = ds['v'].sel(pressure_level=850).drop_vars('pressure_level')
+    u500 = ds['u'].sel(pressure_level=500).drop_vars('pressure_level')
+    v500 = ds['v'].sel(pressure_level=500).drop_vars('pressure_level')
 
     features = xr.Dataset({
         "bulk_shear_10m_850": wind_shear(ds['u10'], ds['v10'], u850, v850),
         "bulk_shear_850_500": wind_shear(u850, v850, u500, v500),
+        "bulk_shear_10m_500": wind_shear(ds['u10'], ds['v10'], u500, v500),
         "dir_shear_10m_850": directional_shear(ds['u10'], ds['v10'], u850, v850),
         "dir_shear_850_500": directional_shear(u850, v850, u500, v500),
+        "dir_shear_10m_500": directional_shear(ds['u10'], ds['v10'], u500, v500),
     })
     return features
 
