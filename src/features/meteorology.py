@@ -61,10 +61,15 @@ def compute_cape_for_timestep(ds: xr.Dataset, time: int) -> np.ndarray:
 
 
 def compute_cape_dask_batched(ds: xr.Dataset) -> xr.DataArray:
-    """Dask parallelized CAPE computation, batched by timestep, using process-based scheduler"""
+    """
+    Dask parallelized CAPE computation, batched by timestep
+    """
     n_time = len(ds['valid_time'])
 
-    promises = [delayed(compute_cape_for_timestep)(ds, t) for t in range(n_time)]
+    promises = [
+        delayed(compute_cape_for_timestep)(ds.isel(valid_time=slice(t, t + 1)), 0)
+        for t in range(n_time)
+    ]
     results = dask.compute(*promises, scheduler='processes')
     capeArr = np.stack(results, axis=-1)
 
