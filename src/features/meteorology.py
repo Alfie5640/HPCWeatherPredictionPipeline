@@ -87,21 +87,6 @@ def compute_brn(cape: xr.DataArray, shear: xr.DataArray) -> xr.DataArray:
     safe_shear = shear.where(shear != 0, 1)
     return cape / (0.5 * safe_shear**2)
 
-def label_from_thresholds(cape: xr.DataArray, shear: xr.DataArray, cape_thresh: float = 500, shear_thresh: float = 15) -> xr.DataArray:
-    """
-    Label as severe favorable if CAPE and shear exceed given thresholds
-    """
-    return (cape >= cape_thresh) & (shear >= shear_thresh)
-
-def label_from_brn(brn: xr.DataArray, low: float = 10, high: float = 45) -> xr.DataArray:
-    """
-    Label as severe favorable if BRN is in the classic range
-    Known limitation: BRN is a ratio (CAPE / shear^2), so in near-zero instability
-    environments, very small CAPE and correspondingly small shear can still
-    produce a BRN value inside the accepted range, giving false positives.
-    """
-    return (brn >= low) & (brn <= high)
-
 
 def compute_shear_features(ds: xr.Dataset) -> xr.Dataset:
     u850 = ds['u'].sel(pressure_level=850).drop_vars('pressure_level')
