@@ -224,3 +224,7 @@ data/raw/*
 # Processed data files (derived, can be regenerated)
 data/processed/*
 !data/processed/.gitkeep
+
+# Trained model artifacts
+models/*
+!models/.gitkeep
