@@ -12,11 +12,12 @@ def load_era5(path: str) -> xr.Dataset:
     return ds
 
 def convert_longitude(ds: xr.Dataset) -> xr.Dataset:
-    """Convert longitude from 0-360 to -180/180 convention and sort ascending."""
+    """Convert longitude from 0-360 to -180/180 convention and sort"""
     ds = ds.assign_coords(longitude=(((ds.longitude + 180) % 360) - 180))
     ds = ds.sortby("longitude")
     return ds
 
 def subset_area(ds: xr.Dataset, north: float, south: float, west: float, east: float) -> xr.Dataset:
-    """Subset a dataset to a lat/lon bounding box. Longitude assumed already in -180/180 form."""
+    """Subset a dataset to a lat/lon bounding box, longitude must be in -180/180 form"""
     return ds.sel(latitude=slice(north, south), longitude=slice(west, east))
+

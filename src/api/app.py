@@ -2,9 +2,15 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import pandas as pd
 import joblib
+from pathlib import Path
 
 app = FastAPI()
-rf_model = joblib.load('models/rf_autumn_2020.joblib')
+
+
+ROOT_DIR = Path(__file__).resolve().parents[2]
+MODEL_PATH = ROOT_DIR / "models" / "rf_autumn_2020.joblib"
+
+rf_model = joblib.load(MODEL_PATH)
 
 class WeatherFeatures(BaseModel):
     bulk_shear_10m_850: float
@@ -30,7 +36,7 @@ def rfPredict(data: WeatherFeatures) -> dict:
     })
 
     rf_probs = rf_model.predict_proba(sentdf)[:, 1]
-    classification = (rf_probs >= 0.35).astype(int)
+    classification = (rf_probs >= 0.5).astype(int)
 
     return {
         "probability": float(rf_probs[0]),

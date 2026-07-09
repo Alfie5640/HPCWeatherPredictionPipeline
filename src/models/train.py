@@ -41,6 +41,8 @@ def xgbModel(X_train : pd.DataFrame, y_train : pd.Series) -> XGBClassifier:
 def rfModel(X_train : pd.DataFrame, y_train : pd.Series) -> RandomForestClassifier:
     rf_model = RandomForestClassifier(
         n_estimators=100,
+        max_depth=20,
+        min_samples_leaf=10,
         random_state=42,
         class_weight="balanced",
         n_jobs=-1
