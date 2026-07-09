@@ -1,12 +1,12 @@
 # ERA5 Heavy Precipitation Prediction Pipeline
 
-An end-to-end machine learning pipeline for detecting heavy precipitation events from ERA5 atmospheric reanalysis data.
+An end-to-end machine learning pipeline for detecting heavy precipitation events from ERA5 atmospheric reanalysis data
 
-The project processes multi-dimensional meteorological data, engineers physics-informed atmospheric predictors, trains machine learning classifiers, and deploys the final model through a FastAPI REST API using Docker.
+The project processes multi-dimensional meteorological data, engineers physics-informed atmospheric predictors, trains machine learning classifiers, and deploys the final model through a FastAPI REST API using Docker
 
 ## Overview
 
-Heavy precipitation prediction is a challenging imbalanced classification problem because extreme rainfall events are rare compared to normal atmospheric conditions.
+Heavy precipitation prediction is a challenging imbalanced classification problem because extreme rainfall events are rare compared to normal atmospheric conditions
 
 This pipeline uses ERA5 reanalysis data to generate meteorological predictors including:
 
@@ -15,31 +15,7 @@ This pipeline uses ERA5 reanalysis data to generate meteorological predictors in
 - Directional wind shear
 - Bulk Richardson Number (BRN)
 
-These physics-informed features are used to train and evaluate machine learning models for heavy precipitation detection.
-
-## Pipeline
-
-ERA5 Reanalysis Data
-        |
-        v
-Data Loading and Preprocessing
-        |
-        v
-Physics-informed Feature Engineering
-(CAPE, wind shear, BRN)
-        |
-        v
-Machine Learning Models
-(Logistic Regression, Random Forest, XGBoost)
-        |
-        v
-Threshold Optimisation
-        |
-        v
-FastAPI Prediction API
-        |
-        v
-Heavy Precipitation Probability
+These physics-informed features are used to train and evaluate machine learning models for heavy precipitation detection
 
 ## Features
 
@@ -54,7 +30,7 @@ Heavy Precipitation Probability
 
 ## Model Performance
 
-Models were evaluated using ROC-AUC and PR-AUC due to the highly imbalanced nature of heavy precipitation events.
+Models were evaluated using ROC-AUC and PR-AUC due to the highly imbalanced nature of heavy precipitation events
 
 Dataset:
 - 1.17 million atmospheric samples
@@ -66,11 +42,11 @@ Dataset:
 | Random Forest | 0.842 | 0.307 |
 | XGBoost | 0.798 | 0.217 |
 
-The Random Forest classifier was selected for deployment.
+The Random Forest classifier was selected for deployment
 
 ## Running the API with Docker
 
-### Build the Docker image
+### Build 
 
 docker build -t weather-api .
 
@@ -78,17 +54,12 @@ docker build -t weather-api .
 
 docker run -p 8000:8000 weather-api
 
-The API will be available at:
-
-http://localhost:8000
-
 Interactive API documentation:
-
 http://localhost:8000/docs
 
 ## Making Predictions
 
-The /predict endpoint accepts atmospheric feature values and returns the predicted probability of heavy precipitation.
+The /predict endpoint accepts atmospheric feature values and returns the predicted probability of heavy precipitation
 
 Example request:
 
@@ -127,18 +98,16 @@ Windows:
 venv\Scripts\activate
 
 Install dependencies:
-
 pip install -r requirements.txt
 
 Run FastAPI:
-
 uvicorn src.api.app:app --reload
 
 ## Data
 
-ERA5 data can be downloaded using the scripts provided in the scripts directory.
+ERA5 data can be downloaded using the scripts in the scripts directory
 
-Raw and processed datasets are excluded from version control due to their size. The pipeline expects ERA5 input data to be available locally when running the feature generation workflow.
+Raw and processed datasets are excluded from version control due to their size. The pipeline expects ERA5 input data to be available locally when running the feature generation workflow
 
 ## Technologies
 
